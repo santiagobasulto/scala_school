@@ -1,0 +1,364 @@
+---
+permalink: basics.html
+title: Conceptos Básico
+layout: post
+desc: Values, functions, classes, methods, inheritance, try-catch-finally. Expression-oriented programming
+---
+
+Esta lección comprende:
+* valores
+* expresiones
+* funciones
+* clases
+* métodos
+* herencia básica
+* try-catch-finally
+
+h2. Información sobre esta clase
+
+Las primeras semanas comprenderá sintaxis y conceptos básicos. Después comenzaremos a extendernos con más ejercicios.
+
+Algunos ejemplos serán dados como si fueran escritos en el intérprete, otros como si fueran escrito en un fichero fuente.
+
+Tener un intérprete a disposición hace más fácil la exploración del lenguaje.
+
+
+h2. El Por qué de Scala
+
+* Expresivo
+** Funciones de primera clase (First-class functions)
+** Closures
+* Conciso
+** Inferencia de tipos
+** Sintaxis para la creación de funciones literales
+* Interoperabilidad con Java
+** Es posible reusar librerías de java
+** Es posible reutilizar herramientas de java
+** Sin reducción de performance
+
+h2. El Cómo de Scala
+
+* Se compila a bytecode de Java
+* Funciona con cualquier JVM estandar
+** Incluso con algunas JVMs no estandar como Dalvik
+** El compilador de Scala fue escrito por el creador del compilador Java.
+
+h2. Pensar en Scala
+
+Scala no es solamente un "java más lindo". Deberías aprenderlo de cero, de esta manera sacarás más provecho de estas clases.
+
+h2. Lanzar el intérprete
+
+Para lanzar el intérprete: <code>sbt console</code>.
+
+<pre>
+$ sbt console
+
+[...]
+
+Welcome to Scala version 2.8.0.final (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_20).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala>
+</pre>
+
+
+h2. Expresiones
+
+<pre>
+scala> 1 + 1
+res0: Int = 2
+</pre>
+
+res0 es el nombre de un valor creado automáticamente por el intérprete para el resultado de tu expresión. Es del tipo Int y contiene el entero (Integer) 2.
+
+(Casi) todo en Scala es una expresión.
+
+h2. Valores
+
+Podés darle al resultado de una expresión un nombre.
+
+<pre>
+scala> val dos = 1 + 1
+dos: Int = 2
+</pre>
+
+No te será posible cambiar el valor asignado a un <code>val</code>. Vendría a tomar un valor constante que no cambiará a lo largo del tiempo.
+
+h3. Variables
+
+Si necesitás cambiar el valor podés usar un <code>var</code> en su lugar. Esto es una variable cómun como la conocemos.
+
+<pre>
+scala> var nombre = "steve"
+nombre: java.lang.String = steve
+
+scala> nombre = "marius"
+nombre: java.lang.String = marius
+</pre>
+
+h3. Funciones
+
+Para crear funciones se utiliza <code>def</code>
+
+<pre>
+scala> def sumarUno(m: Int): Int = m + 1
+sumarUno: (m: Int)Int
+</pre>
+
+In Scala, you need to specify the type signature for function parameters.  The interpreter happily repeats the type signature back to you.
+
+En Scala debés especificar la signatura de tipo para los parámetros de las funciones. No es necesario que lo hagas cuando las invocás. El intérprete se encarga.
+
+<pre>
+scala> val tres = sumarUno(2)
+tres: Int = 3
+</pre>
+
+Es posible obviar los paréntesis en funciones que no reciben argumentos.
+
+<pre>
+scala> def tres() = 1 + 2
+tres: ()Int
+
+scala> tres()
+res2: Int = 3
+
+scala> tres
+res3: Int = 3
+</pre>
+
+h3. Funciones anónimas
+
+Podés crear funciones anónimas.
+
+<pre>
+scala> (x: Int) => x + 1
+res2: (Int) => Int = <function1>
+</pre>
+
+Esta función suma 1 a un entero (Int) llamado <code>x</code>
+
+<pre>
+scala> res2(1)
+res3: Int = 2
+</pre>
+
+You can pass anonymous functions around or save them into vals.
+
+Es posible pasar funciones anónimas como parámetros o guardarlas en <code>val</code>s.
+
+<pre>
+scala> val sumarUno = (x: Int) => x + 1
+sumarUno: (Int) => Int = <function1>
+
+scala> sumarUno(1)
+res4: Int = 2
+</pre>
+
+Si tu función requiere muchas expresiones podés usar llaves ({}) para darte un poco de espacio.
+
+<pre>
+def vecesDos(i: Int): Int = {
+  println("hola mundo")
+  i * 2
+}
+</pre>
+
+Esto también es así para funciones anónimas
+
+<pre>
+scala> { i: Int =>
+  println("hola mundo")
+  i * 2
+}
+res0: (Int) => Int = <function1>
+</pre>
+
+Verás esta sintaxis generalmente usado cuando se pasa una función anónima como argumento.
+
+h4. Aplicación parcial
+
+Podés aplicar una función parcialmente utilizando un guión bajo (_), lo que devuelve otra función.
+
+<pre>
+scala> def sumador(m: Int, n: Int) = m + n
+sumador: (m: Int,n: Int)Int
+</pre>
+
+<pre>
+scala> val suma2 = sumador(2, _:Int)
+suma2: (Int) => Int = <function1>
+
+scala> suma2(3)
+res50: Int = 5
+</pre>
+
+Podés aplicar parcialmente cualquier argumento de la lista que recibe la función, no solamente el último.
+
+h4. Currying
+
+En algunos momentos tiene sentido dejar que la gente utilice algunos argumentos para tu función y otros en otro 
+
+Aquí mostramos un ejemplo de una función que te deja construir multiplicadores de dos números. En una llamada decidirás cuál es el multiplicador y en la otra elegirás el multiplicando.
+
+<pre>
+scala> def multiplicar(m: Int)(n: Int): Int = m * n
+multiplicar: (m: Int)(n: Int)Int
+</pre>
+
+Podés invocarla directamente con ambos argumentos.
+
+<pre>
+scala> multiplicar(2)(3)
+res0: Int = 6
+</pre>
+
+Podés completar el primer parámetro y aplicar parcialmente el segundo.
+
+<pre>
+scala> val vecesDos = multiply(2)(_)
+vecesDos: (Int) => Int = <function1>
+
+scala> vecesDos(3)
+res1: Int = 6
+</pre>
+
+Algunas veces deriva en código muy loco.
+
+<pre>
+multiplicarYfiltrar { m: Int =>
+  m * 2
+} { n: Int =>
+  n < 5
+}
+</pre>
+
+Te prometo que te vas a acostumbrar a esto con el tiempo.
+
+Podés tomar cualquier función de múltiples argumentos y utilizar currying. Probemos con nuestra función anterior, <coder>sumador</coder>
+
+<pre>
+scala> (sumador(_, _)).curried
+res1: (Int) => (Int) => Int = <function1>
+
+scala>res1(7)(9)
+res2: Int = 16
+</pre>
+
+h3. Argumentos de longitud variable
+
+Existe una sintaxis especial para las funciones que pueden tomar varios parámetros de un tipo repetido.
+
+<pre>
+def primeraMayuscula(args: String*) = {
+  args.map { arg =>
+    arg.capitalize
+  }
+}
+</pre>
+
+h3. Clases
+
+<pre>
+scala> class Calculadora {
+     |   val marca: String = "HP"
+     |   def sumar(m: Int, n: Int): Int = m + n
+     | }
+defined class Calculator
+
+scala> val calc = new Calculadora
+calc: Calculadora = Calculadora@e75a11
+
+scala> calc.sumar(1, 2)
+res1: Int = 3
+
+scala> calc.marca
+res2: String = "HP"
+</pre>
+
+En el ejemplo definimos un método con <code>def</code> y un campo con <code>val</code>. Los métodos son solamente funciones que pueden acceder el estado interno de la clase.
+
+h4. Constructor
+
+Los constructores no son métodos especiales, se definen directamente en la clase, fuera del código de los demás métodos. Extendamos nuestra calculadora para tomar un argumento para el constructor e inicializar el estado interno de nuestra clase.
+
+<pre>
+class Calculadora(marca: String) {
+  /**
+   * A constructor.
+   */
+  val color: String = if (marca == "TI") {
+    "blue"
+  } else if (marca == "HP") {
+    "black"
+  } else {
+    "white"
+  }
+
+  // An instance method.
+  def sumar(m: Int, n: Int): Int = m + n
+}
+</pre>
+
+Nótese las dos maneras distintas de añadir comentarios.
+
+h3. Expresiones
+
+Nuestro ejemplo de calculadora mostró cómo Scala está orientado a las expresiones. El valor color fue ligado al resultado de una expresión if/else. Scala está altamente orientado a expresiones.
+
+h3. Inheritance
+
+<pre>
+class CalculadoraCientifica(marca: String) extends Calculadora(marca) {
+  def log(m: Double, base: Double) = math.log(m) / math.log(base)
+}
+</pre>
+
+Para hacer que una clase herede de otra se utiliza la palabra <code>extends</code>. En este caso la clase <code>CalculadoraCientifica</code> pasa a ser una subclase de <code>Calculadora</code> (mientras esta última se dice una super-clase de la primera). Si la superclase define un constructor, es necesario que la subclase lo implemente, mediante los paréntesis después de la definición.
+
+h3. Sobrecarga de métodos
+
+<pre>
+class CalculadoraMasCientifica(marca: String) extends CalculadoraCientifica(marca) {
+  def log(m: Int) = log(m, math.exp(1))
+}
+</pre>
+
+
+h3. Traits
+
+Los <code>traits</code> son colecciones de campos y comportamientos (métodos) que te posibilitan extender el comportamiento de tus clases.
+
+<pre>
+trait Auto {
+  val marca: String
+}
+</pre>
+
+<pre>
+class BMW extends Auto {
+  val marca = "BMW"
+}
+</pre>
+
+h3. Tipos
+
+Anteriormente viste que definimos una función que recibía un <code>Int</code> (entero) que es un tipo de Número. Las funciones también pueden ser genéricas y trabajar sobre cualqquier tipo. Cuando eso ocurre verás un <pre>parámetro de tipo<pre> introducido mediante corchetes:
+
+Es posible introducir múltiples parámetros de tipo. Aquí hay un ejemplo de una caché de claves y valores genéricos.
+
+<pre>
+trait Cache[K, V] {
+  def get(clave: K): V
+  def put(clave: K, valor: V)
+  def eliminar(clave: K)
+}
+</pre>
+
+Los métodos también pueden tener parámetros de tipos.
+
+<pre>
+def borrar[K](clave: K)
+</pre>
